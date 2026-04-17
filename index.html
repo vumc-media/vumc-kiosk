@@ -119,28 +119,23 @@
 
   <div class="wrap">
 
-    <!-- LOGO -->
     <img 
       src="https://yt3.googleusercontent.com/0VzY1FMygvH9BmYV_gu_hNyZsW1kY5VPDdeRtHxyzfcXtqM5Rc6Kongrr_dw3v5I_hwJv63vIQ=s900-c-k-c0x00ffffff-no-rj"
       alt="VUMC Logo"
       class="logo"
     >
 
-    <!-- HEADER -->
     <h1>Welcome to Versailles UMC</h1>
     <p>Tap an option below to get started</p>
 
-    <!-- MENU -->
     <div class="grid">
 
-      <!-- CHECK IN -->
       <div class="card" onclick="goTo('check-in.html')">
         <div class="icon checkin">✓</div>
         <h2>Check In</h2>
       </div>
 
-      <!-- EVENT SIGNUPS -->
-      <div class="card" onclick="comingSoon()">
+      <div class="card" onclick="goTo('event-signups.html')">
         <div class="icon events">📅</div>
         <h2>Event Signups</h2>
       </div>
@@ -158,11 +153,6 @@
       window.location.href = page;
     }
 
-    function comingSoon(){
-      alert("Event Signups coming soon!");
-    }
-
-    // Optional: auto refresh home after inactivity (2 minutes)
     let idleTimer;
     function resetTimer(){
       clearTimeout(idleTimer);
