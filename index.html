@@ -4,14 +4,17 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>VUMC Kiosk</title>
+
   <style>
     :root{
       --blue:#2c7be5;
       --teal:#1fb6aa;
       --navy:#16324f;
+      --gold:#f2c94c;
       --bg:#eef3f9;
       --card:#ffffff;
       --text:#1f2937;
+      --muted:#667085;
       --shadow:0 18px 45px rgba(16,24,40,.10);
     }
 
@@ -20,7 +23,10 @@
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
-      background:linear-gradient(180deg,#eef3f9,#f7f9fc);
+      background:
+        radial-gradient(circle at top left, rgba(44,123,229,.10), transparent 30%),
+        radial-gradient(circle at top right, rgba(31,182,170,.12), transparent 35%),
+        linear-gradient(180deg,#eef3f9,#f7f9fc);
       color:var(--text);
       display:flex;
       align-items:center;
@@ -29,85 +35,146 @@
     }
 
     .wrap{
-      width:min(900px,95%);
+      width:min(1000px,95%);
       text-align:center;
     }
 
+    .logo{
+      width:110px;
+      height:110px;
+      object-fit:cover;
+      border-radius:22px;
+      margin-bottom:16px;
+      box-shadow:0 12px 30px rgba(0,0,0,.15);
+    }
+
     h1{
-      font-size:2.8rem;
-      margin-bottom:10px;
+      font-size:2.6rem;
+      margin:0 0 8px;
       color:var(--navy);
     }
 
     p{
-      margin-bottom:30px;
-      color:#667085;
-      font-size:1.1rem;
+      margin:0 0 32px;
+      color:var(--muted);
+      font-size:1.15rem;
     }
 
     .grid{
       display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
-      gap:20px;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:24px;
     }
 
     .card{
       background:var(--card);
-      border-radius:24px;
-      padding:30px 20px;
+      border-radius:26px;
+      padding:36px 20px;
       box-shadow:var(--shadow);
       cursor:pointer;
-      transition:transform .2s ease, box-shadow .2s ease;
+      transition:all .2s ease;
     }
 
     .card:hover{
-      transform:translateY(-4px);
-      box-shadow:0 22px 50px rgba(16,24,40,.15);
+      transform:translateY(-6px) scale(1.02);
+      box-shadow:0 28px 60px rgba(16,24,40,.18);
     }
 
     .icon{
-      width:80px;
-      height:80px;
-      margin:0 auto 16px;
-      border-radius:20px;
+      width:90px;
+      height:90px;
+      margin:0 auto 18px;
+      border-radius:24px;
       display:flex;
       align-items:center;
       justify-content:center;
-      font-size:2rem;
+      font-size:2.4rem;
       color:#fff;
     }
 
-    .checkin{background:linear-gradient(135deg,var(--blue),var(--teal));}
-    .events{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+    .checkin{
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+    }
+
+    .events{
+      background:linear-gradient(135deg,#f59e0b,#ef4444);
+    }
 
     .card h2{
       margin:0;
-      font-size:1.3rem;
+      font-size:1.4rem;
       color:var(--navy);
+    }
+
+    .footer{
+      margin-top:28px;
+      font-size:.9rem;
+      color:var(--muted);
     }
 
   </style>
 </head>
+
 <body>
 
   <div class="wrap">
-    <h1>Welcome</h1>
-    <p>Please choose an option below</p>
 
+    <!-- LOGO -->
+    <img 
+      src="https://yt3.googleusercontent.com/0VzY1FMygvH9BmYV_gu_hNyZsW1kY5VPDdeRtHxyzfcXtqM5Rc6Kongrr_dw3v5I_hwJv63vIQ=s900-c-k-c0x00ffffff-no-rj"
+      alt="VUMC Logo"
+      class="logo"
+    >
+
+    <!-- HEADER -->
+    <h1>Welcome to Versailles UMC</h1>
+    <p>Tap an option below to get started</p>
+
+    <!-- MENU -->
     <div class="grid">
 
-      <div class="card" onclick="location.href='check-in.html'">
+      <!-- CHECK IN -->
+      <div class="card" onclick="goTo('check-in.html')">
         <div class="icon checkin">✓</div>
         <h2>Check In</h2>
       </div>
 
-      <div class="card" onclick="alert('Coming Soon')">
+      <!-- EVENT SIGNUPS -->
+      <div class="card" onclick="comingSoon()">
         <div class="icon events">📅</div>
         <h2>Event Signups</h2>
       </div>
 
     </div>
+
+    <div class="footer">
+      Ministry Connect Kiosk
+    </div>
+
   </div>
+
+  <script>
+    function goTo(page){
+      window.location.href = page;
+    }
+
+    function comingSoon(){
+      alert("Event Signups coming soon!");
+    }
+
+    // Optional: auto refresh home after inactivity (2 minutes)
+    let idleTimer;
+    function resetTimer(){
+      clearTimeout(idleTimer);
+      idleTimer = setTimeout(() => location.reload(), 120000);
+    }
+
+    ['click','touchstart','mousemove','keydown'].forEach(evt => {
+      document.addEventListener(evt, resetTimer);
+    });
+
+    resetTimer();
+  </script>
 
 </body>
 </html>
