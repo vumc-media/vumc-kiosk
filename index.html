@@ -17,7 +17,8 @@
     .hero h1{position:relative;z-index:1;margin:0 0 8px;font-size:clamp(2rem,4vw,3.2rem);line-height:1.02}
     .hero p{position:relative;z-index:1;margin:0;font-size:1.05rem;line-height:1.6;color:rgba(255,255,255,.92);max-width:760px}
     .panel{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
-    .section-title{font-size:1.35rem;font-weight:700;color:var(--navy);margin:0 0 14px}
+    .section-title{font-size:1.35rem;font-weight:700;color:var(--navy);margin:0 0 8px}
+    .subline{margin:0 0 14px;color:var(--muted);font-size:1rem}
     .alpha{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
     .alpha button,.service-btn,.utility-btn,.submit-btn,.name-chip{font-family:inherit;border:none;cursor:pointer;transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease}
     .alpha button{min-width:46px;min-height:46px;border-radius:12px;background:#fff;color:var(--text);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700}
@@ -63,6 +64,7 @@
 
     <section class="panel" id="mainPanel">
       <h2 class="section-title">Check In</h2>
+      <p class="subline">Date automatically uses today.</p>
       <div id="alpha" class="alpha"></div>
 
       <div class="toolbar">
@@ -118,6 +120,7 @@
     const selectedHintEl = document.getElementById('selectedHint');
     const successScreen = document.getElementById('successScreen');
     const mainPanel = document.getElementById('mainPanel');
+    const successText = document.getElementById('successText');
 
     let selected = new Map();
     let currentQuery = '';
@@ -150,7 +153,7 @@
 
     function startSearch(q,reset=false){
       currentQuery=(q||'').trim();
-      if(!currentQuery){resultsEl.innerHTML='';return}
+      if(!currentQuery){resultsEl.innerHTML='';nextOffset=null;return}
       if(reset) currentOffset=0;
       fetchPage(!reset);
     }
@@ -169,10 +172,24 @@
           const btn=document.createElement('button');
           btn.className='person-btn';
           btn.innerHTML=`<strong>${escapeHtml(p.name)}</strong>`;
-          btn.onclick=()=>{selected.set(p.id,p);renderSelected()};
+          btn.onclick=()=>{addPerson(p)};
           resultsEl.appendChild(btn);
         });
       }catch(e){resultsEl.innerHTML='Search failed.'}
+    }
+
+    function addPerson(p){
+      selected.set(p.id,p);
+      renderSelected();
+      qEl.value='';
+      currentQuery='';
+      currentOffset=0;
+      nextOffset=null;
+      activeLetter='';
+      updateAlpha();
+      resultsEl.innerHTML='';
+      qEl.focus();
+      setStatus('Person added.', 'ok');
     }
 
     function renderSelected(){
@@ -196,6 +213,7 @@
       setStatus('Submitting...');
       const res=await apiCall({action:'submitAttendance',personIds:ids,noteText:'',label:selectedService,isoDate:iso});
       if(res.ok){
+        successText.textContent=`${ids.length} ${ids.length===1?'person has':'people have'} been checked in for ${selectedService} on ${iso}.`;
         mainPanel.style.display='none';
         successScreen.classList.add('show');
         setTimeout(resetKiosk,5000);
@@ -208,9 +226,12 @@
       selected.clear();
       renderSelected();
       qEl.value='';
-      resultsEl.innerHTML='';
+      currentQuery='';
+      currentOffset=0;
+      nextOffset=null;
       activeLetter='';
       updateAlpha();
+      resultsEl.innerHTML='';
       successScreen.classList.remove('show');
       mainPanel.style.display='';
       setStatus('');
@@ -218,7 +239,7 @@
     }
 
     document.getElementById('loadMore').onclick=()=>{if(nextOffset!=null){currentOffset=nextOffset;fetchPage(true)}};
-    document.getElementById('clearSearch').onclick=()=>{qEl.value='';resultsEl.innerHTML=''};
+    document.getElementById('clearSearch').onclick=()=>{qEl.value='';currentQuery='';currentOffset=0;nextOffset=null;activeLetter='';updateAlpha();resultsEl.innerHTML='';qEl.focus()};
     document.getElementById('clearSelected').onclick=()=>{selected.clear();renderSelected()};
     document.getElementById('submitBtn').onclick=submitAttendance;
 
