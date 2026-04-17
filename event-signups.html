@@ -1,0 +1,286 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>VUMC Event Signups</title>
+  <style>
+    :root{--navy:#16324f;--blue:#2c7be5;--teal:#1fb6aa;--gold:#f2c94c;--bg:#eef3f9;--card:#fff;--text:#1f2937;--muted:#667085;--border:rgba(15,23,42,.10);--shadow:0 18px 45px rgba(16,24,40,.10);--success:#0a7a2a;--error:#b00020;--radius:24px;--max:1100px}
+    *{box-sizing:border-box} html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    body{background:radial-gradient(circle at top left, rgba(44,123,229,.10), transparent 28%),radial-gradient(circle at top right, rgba(31,182,170,.12), transparent 32%),linear-gradient(180deg,#eef3f9 0%,#f6f8fb 45%,#edf2f7 100%)}
+    .wrap{width:min(var(--max),calc(100% - 28px));margin:0 auto;padding:18px 0 32px}
+    .hero{background:linear-gradient(135deg, rgba(44,123,229,.95), rgba(74,108,247,.90) 45%, rgba(31,182,170,.88));color:#fff;border-radius:32px;padding:30px 24px;box-shadow:var(--shadow);margin-bottom:18px;position:relative;overflow:hidden}
+    .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}.hero::before{width:220px;height:220px;left:-50px;bottom:-120px}.hero::after{width:180px;height:180px;right:-40px;top:-70px}
+    .hero h1{position:relative;z-index:1;margin:0 0 8px;font-size:clamp(2rem,4vw,3rem);line-height:1.02}.hero p{position:relative;z-index:1;margin:0;line-height:1.6;color:rgba(255,255,255,.92)}
+    .panel{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
+    .back{display:inline-flex;align-items:center;gap:8px;text-decoration:none;color:var(--navy);font-weight:700;background:#fff;padding:12px 16px;border-radius:14px;border:1px solid rgba(15,23,42,.10);margin-bottom:14px}
+    .grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .box{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;min-height:300px}
+    .box h2{margin:0 0 12px;color:var(--navy);font-size:1.25rem}
+    .list{display:flex;flex-direction:column;gap:10px;max-height:420px;overflow:auto}
+    .event-btn,.person-btn,.choice-btn,.utility-btn,.submit-btn,.chip{font-family:inherit;cursor:pointer;border:none;transition:transform .15s ease,opacity .15s ease}
+    .event-btn,.person-btn{width:100%;text-align:left;border:1px solid rgba(15,23,42,.10);background:#fff;border-radius:16px;padding:14px}
+    .event-btn.active{border-color:rgba(44,123,229,.45);box-shadow:0 0 0 4px rgba(44,123,229,.10)}
+    .event-btn strong,.person-btn strong{display:block;color:var(--navy);margin-bottom:4px;font-size:1rem}.event-btn small,.person-btn small{color:var(--muted)}
+    .search{width:100%;min-height:56px;border-radius:16px;border:2px solid rgba(44,123,229,.22);background:#fff;color:var(--text);font:inherit;font-size:1.2rem;padding:12px 16px;outline:none;margin-bottom:12px}
+    .search:focus{border-color:rgba(44,123,229,.60);box-shadow:0 0 0 4px rgba(44,123,229,.10)}
+    .alpha{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.alpha button{min-width:42px;min-height:42px;border-radius:10px;background:#fff;color:var(--text);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700;cursor:pointer}.alpha button.active{background:var(--navy);color:#fff}
+    .event-meta{background:#f8fbff;border:1px solid rgba(44,123,229,.10);border-radius:18px;padding:14px;margin-bottom:12px}.event-meta h3{margin:0 0 6px;color:var(--navy)}.event-meta p{margin:4px 0;color:var(--muted)}
+    .selected{display:flex;flex-wrap:wrap;gap:10px;min-height:46px;margin-bottom:14px}.chip{background:#f0f9f2;color:#14532d;border:1px solid #cfe8d6;border-radius:999px;padding:10px 14px;font-size:1rem;font-weight:700}
+    .choice-grid{display:grid;grid-template-columns:1fr;gap:10px;margin-bottom:16px}.choice-btn{min-height:58px;border-radius:16px;background:#fff;color:var(--navy);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700;padding:12px 14px;text-align:left}.choice-btn.active{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;box-shadow:0 10px 24px rgba(44,123,229,.20)}
+    .submit-btn{width:100%;min-height:64px;border-radius:18px;background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;font-size:1.15rem;font-weight:700;box-shadow:0 14px 28px rgba(44,123,229,.20)}
+    .utility-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}.utility-btn{min-height:48px;padding:12px 16px;border-radius:14px;background:#6b7280;color:#fff;font-weight:700}.utility-btn.secondary{background:#2563eb}
+    .status{min-height:28px;margin-top:14px;font-size:1rem;font-weight:700}.ok{color:var(--success)}.err{color:var(--error)}.hint,.muted{color:var(--muted);line-height:1.6}
+    .success-screen{display:none;text-align:center;padding:30px 16px 10px}.success-screen.show{display:block}.success-icon{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;background:linear-gradient(135deg, rgba(15,118,110,.14), rgba(34,197,94,.18));color:#0f766e;font-size:2.4rem;font-weight:700}.success-screen h2{margin:0 0 10px;font-size:2rem;color:var(--navy)}.success-screen p{margin:0 0 18px;color:var(--muted);font-size:1.05rem;line-height:1.6}
+    @media (max-width:980px){.grid{grid-template-columns:1fr}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <a class="back" href="index.html">← Back to Kiosk Home</a>
+
+    <section class="hero">
+      <h1>Event Signups</h1>
+      <p>Choose a featured event, search for your name, and let us know you plan to attend. This helps us prepare food and seating.</p>
+    </section>
+
+    <section class="panel" id="mainPanel">
+      <div class="grid">
+        <div class="box">
+          <h2>Featured Events</h2>
+          <div id="eventList" class="list"></div>
+          <div id="eventHint" class="hint" style="margin-top:12px;">Choose an event to continue.</div>
+        </div>
+
+        <div class="box">
+          <h2>Your Response</h2>
+          <div id="eventMeta" class="event-meta" style="display:none;"></div>
+
+          <div id="alpha" class="alpha"></div>
+          <input id="q" class="search" type="search" placeholder="Type last name or first name" autocomplete="off" />
+          <div id="personList" class="list"></div>
+          <div class="utility-row">
+            <button id="loadMore" type="button" class="utility-btn secondary">Load More</button>
+            <button id="clearSearch" type="button" class="utility-btn">Clear Search</button>
+          </div>
+
+          <div style="margin-top:16px;">
+            <h2 style="margin-bottom:10px;">Selected Person</h2>
+            <div id="selected" class="selected"></div>
+            <div id="selectedHint" class="hint">No one selected yet.</div>
+          </div>
+
+          <div style="margin-top:16px;">
+            <h2 style="margin-bottom:10px;">Response</h2>
+            <div class="choice-grid">
+              <button type="button" class="choice-btn active" data-choice="I Plan to Attend">I Plan to Attend</button>
+            </div>
+          </div>
+
+          <button id="submitBtn" class="submit-btn" type="button">Submit Response</button>
+          <div class="status" id="status"></div>
+        </div>
+      </div>
+    </section>
+
+    <section id="successScreen" class="panel success-screen">
+      <div class="success-icon">✓</div>
+      <h2>Response Submitted</h2>
+      <p id="successText">Thank you. We have recorded your response.</p>
+    </section>
+  </div>
+
+  <script>
+    const SCRIPT_URL = "PASTE_YOUR_EVENT_SIGNUPS_WEB_APP_URL_HERE";
+
+    const eventListEl = document.getElementById('eventList');
+    const eventMetaEl = document.getElementById('eventMeta');
+    const qEl = document.getElementById('q');
+    const alphaEl = document.getElementById('alpha');
+    const personListEl = document.getElementById('personList');
+    const selectedEl = document.getElementById('selected');
+    const selectedHintEl = document.getElementById('selectedHint');
+    const statusEl = document.getElementById('status');
+    const successScreen = document.getElementById('successScreen');
+    const mainPanel = document.getElementById('mainPanel');
+    const successText = document.getElementById('successText');
+
+    let featuredEvents = [];
+    let selectedEvent = null;
+    let selectedPerson = null;
+    let selectedChoice = 'I Plan to Attend';
+    let currentQuery = '';
+    let currentOffset = 0;
+    let nextOffset = null;
+    let activeLetter = '';
+    let debounceTimer = null;
+    const PAGE_SIZE = 25;
+
+    function escapeHtml(s){return String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+    function setStatus(m,k=''){statusEl.className='status'+(k?' '+k:'');statusEl.textContent=m||''}
+    function ensureScriptUrl(){if(!SCRIPT_URL.trim()||SCRIPT_URL.includes('PASTE_YOUR_EVENT_SIGNUPS_WEB_APP_URL_HERE')){setStatus('Event signup script URL is missing.','err');return false}return true}
+
+    async function apiCall(payload){
+      const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
+      const text=await res.text();
+      if(!text.trim()) throw new Error('Empty response from Apps Script');
+      return JSON.parse(text);
+    }
+
+    function buildAlpha(){'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{activeLetter=l;updateAlpha();qEl.value=l;startSearch(l,true)};alphaEl.appendChild(b)})}
+    function updateAlpha(){alphaEl.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent===activeLetter))}
+
+    async function loadFeaturedEvents(){
+      if(!ensureScriptUrl()) return;
+      eventListEl.innerHTML='Loading...';
+      try{
+        const url=SCRIPT_URL+'?action=getFeaturedEvents';
+        const res=await fetch(url);
+        const text=await res.text();
+        if(!text.trim()) throw new Error('Empty response');
+        const data=JSON.parse(text);
+        featuredEvents=data.events||[];
+        renderEvents();
+      }catch(err){
+        console.error(err);
+        eventListEl.innerHTML='Could not load events.';
+      }
+    }
+
+    function renderEvents(){
+      eventListEl.innerHTML='';
+      if(!featuredEvents.length){eventListEl.innerHTML='<div class="hint">No featured events available right now.</div>';return}
+      featuredEvents.forEach(ev=>{
+        const btn=document.createElement('button');
+        btn.type='button';
+        btn.className='event-btn'+(selectedEvent&&selectedEvent.id===ev.id?' active':'');
+        btn.innerHTML=`<strong>${escapeHtml(ev.name)}</strong><small>${escapeHtml(ev.display_date||'')}</small>`;
+        btn.onclick=()=>selectEvent(ev);
+        eventListEl.appendChild(btn);
+      })
+    }
+
+    function selectEvent(ev){
+      selectedEvent=ev;
+      renderEvents();
+      eventMetaEl.style.display='block';
+      eventMetaEl.innerHTML=`<h3>${escapeHtml(ev.name)}</h3><p>${escapeHtml(ev.display_date||'')}</p>${ev.description?`<p>${escapeHtml(ev.description)}</p>`:''}`;
+      setStatus('Event selected. Search for a person.', 'ok');
+      qEl.focus();
+    }
+
+    function startSearch(q,reset=false){
+      currentQuery=(q||'').trim();
+      if(!currentQuery){personListEl.innerHTML='';nextOffset=null;return}
+      if(reset) currentOffset=0;
+      fetchPeople(!reset);
+    }
+
+    async function fetchPeople(append=false){
+      if(!ensureScriptUrl()) return;
+      if(!append) personListEl.innerHTML='Loading...';
+      try{
+        const url=SCRIPT_URL+'?action=searchPeople&q='+encodeURIComponent(currentQuery)+'&offset='+currentOffset+'&limit='+PAGE_SIZE;
+        const res=await fetch(url);
+        const text=await res.text();
+        if(!text.trim()) throw new Error('Empty response');
+        const data=JSON.parse(text);
+        const rows=data.rows||[];
+        nextOffset=('nextOffset' in data)?data.nextOffset:null;
+        if(!append) personListEl.innerHTML='';
+        if(!rows.length&&!append){personListEl.innerHTML='No matches found.';return}
+        rows.forEach(p=>{
+          const btn=document.createElement('button');
+          btn.type='button';
+          btn.className='person-btn';
+          btn.innerHTML=`<strong>${escapeHtml(toLastFirst(p.name))}</strong><small>${p.primary_email?escapeHtml(p.primary_email):'Tap to select'}</small>`;
+          btn.onclick=()=>selectPerson(p);
+          personListEl.appendChild(btn);
+        })
+      }catch(err){console.error(err);personListEl.innerHTML='Search failed.'}
+    }
+
+    function selectPerson(p){
+      selectedPerson=p;
+      renderSelected();
+      qEl.value='';
+      currentQuery='';
+      currentOffset=0;
+      nextOffset=null;
+      activeLetter='';
+      updateAlpha();
+      personListEl.innerHTML='';
+      qEl.focus();
+      setStatus('Person selected.', 'ok');
+    }
+
+    function renderSelected(){
+      selectedEl.innerHTML='';
+      if(!selectedPerson){selectedHintEl.style.display='';return}
+      selectedHintEl.style.display='none';
+      const chip=document.createElement('button');
+      chip.type='button';
+      chip.className='chip';
+      chip.textContent=toLastFirst(selectedPerson.name)+' ×';
+      chip.onclick=()=>{selectedPerson=null;renderSelected()};
+      selectedEl.appendChild(chip);
+    }
+
+    document.querySelectorAll('.choice-btn').forEach(btn=>{
+      btn.onclick=()=>{
+        document.querySelectorAll('.choice-btn').forEach(b=>b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedChoice=btn.dataset.choice;
+      }
+    });
+
+    async function submitResponse(){
+      if(!ensureScriptUrl()) return;
+      if(!selectedEvent){setStatus('Choose an event first.','err');return}
+      if(!selectedPerson){setStatus('Choose a person first.','err');return}
+      setStatus('Submitting response...');
+      try{
+        const res=await apiCall({action:'submitEventSignup',event:selectedEvent,person:selectedPerson,response:selectedChoice});
+        if(res&&res.ok){
+          successText.textContent=`${toLastFirst(selectedPerson.name)} has been recorded for ${selectedEvent.name}.`;
+          mainPanel.style.display='none';
+          successScreen.classList.add('show');
+          setTimeout(resetPage,5000);
+        }else{
+          setStatus(res?.error||'Submit failed.','err');
+        }
+      }catch(err){console.error(err);setStatus('Submit failed.','err')}
+    }
+
+    function resetPage(){
+      selectedEvent=null;
+      selectedPerson=null;
+      selectedChoice='I Plan to Attend';
+      currentQuery='';
+      currentOffset=0;
+      nextOffset=null;
+      activeLetter='';
+      qEl.value='';
+      personListEl.innerHTML='';
+      eventMetaEl.style.display='none';
+      updateAlpha();
+      renderSelected();
+      renderEvents();
+      successScreen.classList.remove('show');
+      mainPanel.style.display='';
+      setStatus('');
+    }
+
+    function toLastFirst(name){const s=String(name||'').trim();if(!s) return '';if(s.includes(',')) return s;const parts=s.split(/\s+/);if(parts.length===1) return s;const last=parts.pop();const first=parts.join(' ');return `${last}, ${first}`.replace(/^, |, $/g,'')}
+
+    document.getElementById('loadMore').onclick=()=>{if(nextOffset!=null){currentOffset=nextOffset;fetchPeople(true)}};
+    document.getElementById('clearSearch').onclick=()=>{qEl.value='';currentQuery='';currentOffset=0;nextOffset=null;activeLetter='';updateAlpha();personListEl.innerHTML='';qEl.focus()};
+    document.getElementById('submitBtn').onclick=submitResponse;
+    qEl.addEventListener('input',()=>{activeLetter='';updateAlpha();clearTimeout(debounceTimer);debounceTimer=setTimeout(()=>startSearch(qEl.value,true),250)});
+
+    buildAlpha();
+    loadFeaturedEvents();
+    qEl.focus();
+  </script>
+</body>
+</html>
