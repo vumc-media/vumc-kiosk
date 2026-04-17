@@ -2,255 +2,112 @@
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-  <title>VUMC Check-In Kiosk</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VUMC Kiosk</title>
   <style>
-    :root{--navy:#16324f;--blue:#2c7be5;--teal:#1fb6aa;--gold:#f2c94c;--bg:#eef3f9;--card:#ffffff;--text:#1f2937;--muted:#667085;--border:rgba(15,23,42,.10);--shadow:0 18px 45px rgba(16,24,40,.10);--success:#0a7a2a;--error:#b00020;--radius:24px;--max:1100px}
+    :root{
+      --blue:#2c7be5;
+      --teal:#1fb6aa;
+      --navy:#16324f;
+      --bg:#eef3f9;
+      --card:#ffffff;
+      --text:#1f2937;
+      --shadow:0 18px 45px rgba(16,24,40,.10);
+    }
+
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
-    body{background:radial-gradient(circle at top left, rgba(44,123,229,.10), transparent 28%),radial-gradient(circle at top right, rgba(31,182,170,.12), transparent 32%),linear-gradient(180deg,#eef3f9 0%,#f6f8fb 45%,#edf2f7 100%)}
-    .wrap{width:min(var(--max), calc(100% - 28px));margin:0 auto;padding:18px 0 32px}
-    .hero{background:linear-gradient(135deg, rgba(44,123,229,.95), rgba(74,108,247,.90) 45%, rgba(31,182,170,.88));color:#fff;border-radius:32px;padding:30px 24px;box-shadow:var(--shadow);margin-bottom:18px;position:relative;overflow:hidden}
-    .hero::before,.hero::after{content:"";position:absolute;border-radius:50%;background:rgba(255,255,255,.10);pointer-events:none}
-    .hero::before{width:220px;height:220px;left:-50px;bottom:-120px}
-    .hero::after{width:180px;height:180px;right:-40px;top:-70px}
-    .hero h1{position:relative;z-index:1;margin:0 0 8px;font-size:clamp(2rem,4vw,3.2rem);line-height:1.02}
-    .hero p{position:relative;z-index:1;margin:0;font-size:1.05rem;line-height:1.6;color:rgba(255,255,255,.92);max-width:760px}
-    .panel{background:rgba(255,255,255,.94);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);padding:20px}
-    .section-title{font-size:1.35rem;font-weight:700;color:var(--navy);margin:0 0 8px}
-    .subline{margin:0 0 14px;color:var(--muted);font-size:1rem}
-    .alpha{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}
-    .alpha button,.service-btn,.utility-btn,.submit-btn,.name-chip{font-family:inherit;border:none;cursor:pointer;transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease}
-    .alpha button{min-width:46px;min-height:46px;border-radius:12px;background:#fff;color:var(--text);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700}
-    .alpha button.active{background:var(--navy);color:#fff}
-    .toolbar{display:grid;grid-template-columns:1.4fr .9fr;gap:12px;align-items:center;margin-bottom:16px}
-    .search{width:100%;min-height:58px;border-radius:16px;border:2px solid rgba(44,123,229,.22);background:#fff;color:var(--text);font:inherit;font-size:1.35rem;padding:12px 16px;outline:none}
-    .search:focus{border-color:rgba(44,123,229,.60);box-shadow:0 0 0 4px rgba(44,123,229,.10)}
-    .service-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
-    .service-btn{min-height:58px;border-radius:16px;background:#fff;color:var(--navy);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700;padding:10px 12px}
-    .service-btn.active{background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;box-shadow:0 10px 24px rgba(44,123,229,.20)}
-    .results-wrap{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:6px}
-    .box{background:#fff;border:1px solid rgba(15,23,42,.08);border-radius:20px;padding:16px;min-height:340px}
-    .box h2{margin:0 0 12px;color:var(--navy);font-size:1.25rem}
-    .list{display:flex;flex-direction:column;gap:8px;max-height:340px;overflow:auto}
-    .person-btn{width:100%;text-align:left;border:1px solid rgba(15,23,42,.10);background:#fff;border-radius:16px;padding:14px 14px;cursor:pointer;font:inherit;color:var(--text)}
-    .person-btn strong{display:block;font-size:1rem;color:var(--navy);margin-bottom:4px}
-    .person-btn small{color:var(--muted);font-size:.92rem}
-    .selected-chips{display:flex;flex-wrap:wrap;gap:10px;min-height:46px;margin-bottom:14px}
-    .name-chip{background:#f0f9f2;color:#14532d;border:1px solid #cfe8d6;border-radius:999px;padding:10px 14px;font-size:1rem;font-weight:700}
-    .utility-row{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
-    .utility-btn{min-height:50px;padding:12px 16px;border-radius:14px;font-size:1rem;font-weight:700;background:#6b7280;color:#fff}
-    .utility-btn.secondary{background:#2563eb}
-    .submit-btn{width:100%;min-height:66px;border-radius:18px;background:linear-gradient(135deg,var(--blue),var(--teal));color:#fff;font-size:1.2rem;font-weight:700;box-shadow:0 14px 28px rgba(44,123,229,.20);margin-top:16px}
-    .status{min-height:28px;margin-top:14px;font-size:1rem;font-weight:700}
-    .ok{color:var(--success)}
-    .err{color:var(--error)}
-    .muted{color:var(--muted)}
-    .hint{color:var(--muted);line-height:1.6;font-size:1rem}
-    .success-screen{display:none;text-align:center;padding:30px 16px 10px}
-    .success-screen.show{display:block}
-    .success-icon{width:92px;height:92px;border-radius:50%;display:grid;place-items:center;margin:0 auto 16px;background:linear-gradient(135deg, rgba(15,118,110,.14), rgba(34,197,94,.18));color:#0f766e;font-size:2.4rem;font-weight:700}
-    .success-screen h2{margin:0 0 10px;font-size:2rem;color:var(--navy)}
-    .success-screen p{margin:0 0 18px;color:var(--muted);font-size:1.05rem;line-height:1.6}
-    @media (max-width:980px){.toolbar,.results-wrap{grid-template-columns:1fr}}
+
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#eef3f9,#f7f9fc);
+      color:var(--text);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:100vh;
+    }
+
+    .wrap{
+      width:min(900px,95%);
+      text-align:center;
+    }
+
+    h1{
+      font-size:2.8rem;
+      margin-bottom:10px;
+      color:var(--navy);
+    }
+
+    p{
+      margin-bottom:30px;
+      color:#667085;
+      font-size:1.1rem;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
+      gap:20px;
+    }
+
+    .card{
+      background:var(--card);
+      border-radius:24px;
+      padding:30px 20px;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition:transform .2s ease, box-shadow .2s ease;
+    }
+
+    .card:hover{
+      transform:translateY(-4px);
+      box-shadow:0 22px 50px rgba(16,24,40,.15);
+    }
+
+    .icon{
+      width:80px;
+      height:80px;
+      margin:0 auto 16px;
+      border-radius:20px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:2rem;
+      color:#fff;
+    }
+
+    .checkin{background:linear-gradient(135deg,var(--blue),var(--teal));}
+    .events{background:linear-gradient(135deg,#f59e0b,#ef4444);}
+
+    .card h2{
+      margin:0;
+      font-size:1.3rem;
+      color:var(--navy);
+    }
+
   </style>
 </head>
 <body>
+
   <div class="wrap">
-    <section class="hero">
-      <h1>VUMC Check-In Kiosk</h1>
-      <p>Choose a last-name letter or type a name, tap the correct person, choose a service, and submit.</p>
-    </section>
+    <h1>Welcome</h1>
+    <p>Please choose an option below</p>
 
-    <section class="panel" id="mainPanel">
-      <h2 class="section-title">Check In</h2>
-      <p class="subline">Date automatically uses today.</p>
-      <div id="alpha" class="alpha"></div>
+    <div class="grid">
 
-      <div class="toolbar">
-        <input id="q" class="search" type="search" placeholder="Type last name or first name" autocomplete="off" />
-        <div class="service-grid">
-          <button type="button" class="service-btn active" data-service="Attendance">Attendance</button>
-          <button type="button" class="service-btn" data-service="Traditional Worship">Traditional</button>
-          <button type="button" class="service-btn" data-service="Contemporary Worship">Contemporary</button>
-          <button type="button" class="service-btn" data-service="Blended Worship">Blended</button>
-        </div>
+      <div class="card" onclick="location.href='check-in.html'">
+        <div class="icon checkin">✓</div>
+        <h2>Check In</h2>
       </div>
 
-      <div class="results-wrap">
-        <div class="box">
-          <h2>Results</h2>
-          <div id="results" class="list"></div>
-          <div class="utility-row">
-            <button id="loadMore" type="button" class="utility-btn secondary">Load More</button>
-            <button id="clearSearch" type="button" class="utility-btn">Clear Search</button>
-          </div>
-          <div class="hint" style="margin-top:14px;">Tap a person to add them to check-in.</div>
-        </div>
-
-        <div class="box">
-          <h2>Selected</h2>
-          <div id="selected" class="selected-chips"></div>
-          <div id="selectedHint" class="hint">No one selected yet.</div>
-
-          <button id="submitBtn" class="submit-btn" type="button">Submit Check-In</button>
-          <div class="utility-row">
-            <button id="clearSelected" type="button" class="utility-btn">Clear Selected</button>
-          </div>
-          <div id="status" class="status"></div>
-        </div>
+      <div class="card" onclick="alert('Coming Soon')">
+        <div class="icon events">📅</div>
+        <h2>Event Signups</h2>
       </div>
-    </section>
 
-    <section id="successScreen" class="panel success-screen">
-      <div class="success-icon">✓</div>
-      <h2>Check-In Submitted</h2>
-      <p id="successText">Thank you. Your attendance has been recorded.</p>
-    </section>
+    </div>
   </div>
 
-  <script>
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxwstyvtDh-XAQtxijZyuS1RfXkmjUeh5SZXBUwInD0yOjlHD3oSez3w1LAjRaMCletKw/exec";
-
-    const qEl = document.getElementById('q');
-    const alphaEl = document.getElementById('alpha');
-    const resultsEl = document.getElementById('results');
-    const selectedEl = document.getElementById('selected');
-    const statusEl = document.getElementById('status');
-    const selectedHintEl = document.getElementById('selectedHint');
-    const successScreen = document.getElementById('successScreen');
-    const mainPanel = document.getElementById('mainPanel');
-    const successText = document.getElementById('successText');
-
-    let selected = new Map();
-    let currentQuery = '';
-    let currentOffset = 0;
-    let nextOffset = null;
-    let activeLetter = '';
-    let selectedService = 'Attendance';
-    let debounceTimer = null;
-    const PAGE_SIZE = 25;
-
-    function escapeHtml(s){return String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
-    function setStatus(m,k=''){statusEl.className='status'+(k?' '+k:'');statusEl.textContent=m||''}
-
-    function buildAlpha(){'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').forEach(l=>{const b=document.createElement('button');b.textContent=l;b.onclick=()=>{activeLetter=l;updateAlpha();qEl.value=l;startSearch(l,true)};alphaEl.appendChild(b)})}
-    function updateAlpha(){alphaEl.querySelectorAll('button').forEach(b=>b.classList.toggle('active',b.textContent===activeLetter))}
-
-    document.querySelectorAll('.service-btn').forEach(btn=>{
-      btn.onclick=()=>{
-        document.querySelectorAll('.service-btn').forEach(b=>b.classList.remove('active'));
-        btn.classList.add('active');
-        selectedService=btn.dataset.service;
-      }
-    });
-
-    async function apiCall(payload){
-      const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
-      const text=await res.text();
-      return JSON.parse(text);
-    }
-
-    function startSearch(q,reset=false){
-      currentQuery=(q||'').trim();
-      if(!currentQuery){resultsEl.innerHTML='';nextOffset=null;return}
-      if(reset) currentOffset=0;
-      fetchPage(!reset);
-    }
-
-    async function fetchPage(append=false){
-      if(!append) resultsEl.innerHTML='Loading...';
-      try{
-        const url=SCRIPT_URL+'?action=searchPeople&q='+encodeURIComponent(currentQuery)+'&offset='+currentOffset+'&limit='+PAGE_SIZE;
-        const res=await fetch(url);
-        const data=await res.json();
-        const rows=data.rows||[];
-        nextOffset=data.nextOffset;
-        if(!append) resultsEl.innerHTML='';
-        if(!rows.length){resultsEl.innerHTML='No matches found.';return}
-        rows.forEach(p=>{
-          const btn=document.createElement('button');
-          btn.className='person-btn';
-          btn.innerHTML=`<strong>${escapeHtml(p.name)}</strong>`;
-          btn.onclick=()=>{addPerson(p)};
-          resultsEl.appendChild(btn);
-        });
-      }catch(e){resultsEl.innerHTML='Search failed.'}
-    }
-
-    function addPerson(p){
-      selected.set(p.id,p);
-      renderSelected();
-      qEl.value='';
-      currentQuery='';
-      currentOffset=0;
-      nextOffset=null;
-      activeLetter='';
-      updateAlpha();
-      resultsEl.innerHTML='';
-      qEl.focus();
-      setStatus('Person added.', 'ok');
-    }
-
-    function renderSelected(){
-      selectedEl.innerHTML='';
-      if(!selected.size){selectedHintEl.style.display='';return}
-      selectedHintEl.style.display='none';
-      selected.forEach(p=>{
-        const chip=document.createElement('button');
-        chip.className='name-chip';
-        chip.textContent=p.name+' ×';
-        chip.onclick=()=>{selected.delete(p.id);renderSelected()};
-        selectedEl.appendChild(chip);
-      })
-    }
-
-    async function submitAttendance(){
-      if(!selected.size){setStatus('Select someone','err');return}
-      const ids=[...selected.keys()];
-      const d=new Date();
-      const iso=d.toISOString().split('T')[0];
-      setStatus('Submitting...');
-      const res=await apiCall({action:'submitAttendance',personIds:ids,noteText:'',label:selectedService,isoDate:iso});
-      if(res.ok){
-        successText.textContent=`${ids.length} ${ids.length===1?'person has':'people have'} been checked in for ${selectedService} on ${iso}.`;
-        mainPanel.style.display='none';
-        successScreen.classList.add('show');
-        setTimeout(resetKiosk,5000);
-      } else {
-        setStatus('Submit failed','err');
-      }
-    }
-
-    function resetKiosk(){
-      selected.clear();
-      renderSelected();
-      qEl.value='';
-      currentQuery='';
-      currentOffset=0;
-      nextOffset=null;
-      activeLetter='';
-      updateAlpha();
-      resultsEl.innerHTML='';
-      successScreen.classList.remove('show');
-      mainPanel.style.display='';
-      setStatus('');
-      qEl.focus();
-    }
-
-    document.getElementById('loadMore').onclick=()=>{if(nextOffset!=null){currentOffset=nextOffset;fetchPage(true)}};
-    document.getElementById('clearSearch').onclick=()=>{qEl.value='';currentQuery='';currentOffset=0;nextOffset=null;activeLetter='';updateAlpha();resultsEl.innerHTML='';qEl.focus()};
-    document.getElementById('clearSelected').onclick=()=>{selected.clear();renderSelected()};
-    document.getElementById('submitBtn').onclick=submitAttendance;
-
-    qEl.addEventListener('input',()=>{
-      activeLetter='';updateAlpha();
-      clearTimeout(debounceTimer);
-      debounceTimer=setTimeout(()=>startSearch(qEl.value,true),250);
-    });
-
-    buildAlpha();
-    qEl.focus();
-  </script>
 </body>
 </html>
