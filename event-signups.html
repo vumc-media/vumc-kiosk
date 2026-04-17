@@ -22,7 +22,7 @@
     .event-btn,.person-btn{width:100%;text-align:left;border:1px solid rgba(15,23,42,.10);background:#fff;border-radius:16px;padding:14px}
     .event-btn.active{border-color:rgba(44,123,229,.45);box-shadow:0 0 0 4px rgba(44,123,229,.10)}
     .event-btn strong,.person-btn strong{display:block;color:var(--navy);margin-bottom:4px;font-size:1rem}.event-btn small,.person-btn small{color:var(--muted)}
-    .search{width:100%;min-height:56px;border-radius:16px;border:2px solid rgba(44,123,229,.22);background:#fff;color:var(--text);font:inherit;font-size:1.2rem;padding:12px 16px;outline:none;margin-bottom:12px}
+    .search{width:100%;min-height:56px;border-radius:16px;border:2px solid rgba(44,123,229,.22);background:#fff;color:var(--text);font:inherit;font-size:1.1rem;padding:12px 16px;outline:none;margin-bottom:12px}
     .search:focus{border-color:rgba(44,123,229,.60);box-shadow:0 0 0 4px rgba(44,123,229,.10)}
     .alpha{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 12px}.alpha button{min-width:42px;min-height:42px;border-radius:10px;background:#fff;color:var(--text);border:1px solid rgba(15,23,42,.10);font-size:1rem;font-weight:700;cursor:pointer}.alpha button.active{background:var(--navy);color:#fff}
     .event-meta{background:#f8fbff;border:1px solid rgba(44,123,229,.10);border-radius:18px;padding:14px;margin-bottom:12px}.event-meta h3{margin:0 0 6px;color:var(--navy)}.event-meta p{margin:4px 0;color:var(--muted)}
@@ -41,13 +41,14 @@
 
     <section class="hero">
       <h1>Event Signups</h1>
-      <p>Choose a featured event, search for your name, and let us know you plan to attend. This helps us prepare food and seating.</p>
+      <p>Choose a featured upcoming event, search for your name, and let us know you plan to attend. This helps us prepare food and seating.</p>
     </section>
 
     <section class="panel" id="mainPanel">
       <div class="grid">
         <div class="box">
           <h2>Featured Events</h2>
+          <input id="eventSearch" class="search" type="search" placeholder="Search event name" autocomplete="off" />
           <div id="eventList" class="list"></div>
           <div id="eventHint" class="hint" style="margin-top:12px;">Choose an event to continue.</div>
         </div>
@@ -95,6 +96,7 @@
 
     const eventListEl = document.getElementById('eventList');
     const eventMetaEl = document.getElementById('eventMeta');
+    const eventSearchEl = document.getElementById('eventSearch');
     const qEl = document.getElementById('q');
     const alphaEl = document.getElementById('alpha');
     const personListEl = document.getElementById('personList');
@@ -106,6 +108,7 @@
     const successText = document.getElementById('successText');
 
     let featuredEvents = [];
+    let filteredEvents = [];
     let selectedEvent = null;
     let selectedPerson = null;
     let selectedChoice = 'I Plan to Attend';
@@ -116,9 +119,9 @@
     let debounceTimer = null;
     const PAGE_SIZE = 25;
 
-    function escapeHtml(s){return String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+    function escapeHtml(s){return String(s||'').replace(/[&<>\"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','\"':'&quot;',\"'\":'&#39;'}[m]))}
     function setStatus(m,k=''){statusEl.className='status'+(k?' '+k:'');statusEl.textContent=m||''}
-    function ensureScriptUrl(){if(!SCRIPT_URL.trim()||SCRIPT_URL.includes('PASTE_YOUR_EVENT_SIGNUPS_WEB_APP_URL_HERE')){setStatus('Event signup script URL is missing.','err');return false}return true}
+    function ensureScriptUrl(){if(!SCRIPT_URL.trim()){setStatus('Event signup script URL is missing.','err');return false}return true}
 
     async function apiCall(payload){
       const res=await fetch(SCRIPT_URL,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(payload)});
@@ -139,7 +142,8 @@
         const text=await res.text();
         if(!text.trim()) throw new Error('Empty response');
         const data=JSON.parse(text);
-        featuredEvents=data.events||[];
+        featuredEvents=(data.events||[]).filter(isCurrentOrFutureEvent_);
+        filteredEvents=[...featuredEvents];
         renderEvents();
       }catch(err){
         console.error(err);
@@ -147,10 +151,29 @@
       }
     }
 
+    function isCurrentOrFutureEvent_(ev){
+      const start = ev && ev.starts_at ? new Date(ev.starts_at) : null;
+      const end = ev && ev.ends_at ? new Date(ev.ends_at) : null;
+      const now = new Date();
+      if(end && !isNaN(end.getTime())) return end >= now;
+      if(start && !isNaN(start.getTime())) return start >= new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      return true;
+    }
+
+    function filterEvents(){
+      const q = (eventSearchEl.value || '').trim().toLowerCase();
+      if(!q){
+        filteredEvents = [...featuredEvents];
+      } else {
+        filteredEvents = featuredEvents.filter(ev => String(ev.name || '').toLowerCase().includes(q));
+      }
+      renderEvents();
+    }
+
     function renderEvents(){
       eventListEl.innerHTML='';
-      if(!featuredEvents.length){eventListEl.innerHTML='<div class="hint">No featured events available right now.</div>';return}
-      featuredEvents.forEach(ev=>{
+      if(!filteredEvents.length){eventListEl.innerHTML='<div class="hint">No current featured events match your search.</div>';return}
+      filteredEvents.forEach(ev=>{
         const btn=document.createElement('button');
         btn.type='button';
         btn.className='event-btn'+(selectedEvent&&selectedEvent.id===ev.id?' active':'');
@@ -261,8 +284,10 @@
       nextOffset=null;
       activeLetter='';
       qEl.value='';
+      eventSearchEl.value='';
       personListEl.innerHTML='';
       eventMetaEl.style.display='none';
+      filteredEvents=[...featuredEvents];
       updateAlpha();
       renderSelected();
       renderEvents();
@@ -277,6 +302,7 @@
     document.getElementById('clearSearch').onclick=()=>{qEl.value='';currentQuery='';currentOffset=0;nextOffset=null;activeLetter='';updateAlpha();personListEl.innerHTML='';qEl.focus()};
     document.getElementById('submitBtn').onclick=submitResponse;
     qEl.addEventListener('input',()=>{activeLetter='';updateAlpha();clearTimeout(debounceTimer);debounceTimer=setTimeout(()=>startSearch(qEl.value,true),250)});
+    eventSearchEl.addEventListener('input', filterEvents);
 
     buildAlpha();
     loadFeaturedEvents();
