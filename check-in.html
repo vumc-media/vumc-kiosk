@@ -326,7 +326,7 @@
   <div class="wrap">
     <section class="hero">
       <h1>VUMC Check-In</h1>
-      <p>Search by last name, email, or mobile number, select one or more people, choose a service, and submit.</p>
+      <p>Search by last name, select one or more people, choose a service, and submit.</p>
     </section>
 
     <section class="panel" id="mainPanel">
@@ -334,7 +334,7 @@
       <p class="subline">Date automatically uses today.</p>
 
       <div class="toolbar">
-        <input id="q" class="search" type="search" placeholder="Type last name, email, or mobile number" autocomplete="off" />
+        <input id="q" class="search" type="search" placeholder="Type last name" autocomplete="off" />
 
         <div class="service-grid">
           <button type="button" class="service-btn active" data-service="Traditional Worship">Traditional</button>
@@ -352,7 +352,7 @@
             <button id="addSelected" type="button" class="utility-btn secondary">Add Selected</button>
             <button id="clearSearch" type="button" class="utility-btn">Clear Search</button>
           </div>
-          <div class="hint" style="margin-top:14px;">Search by last name, email, or mobile number, then tap Add Selected.</div>
+          <div class="hint" style="margin-top:14px;">Search by last name, then tap Add Selected.</div>
         </div>
 
         <div class="box">
@@ -414,10 +414,6 @@
       statusEl.textContent = message || '';
     }
 
-    function digitsOnly(s){
-      return String(s || '').replace(/\D+/g,'');
-    }
-
     document.querySelectorAll('.service-btn').forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
@@ -450,10 +446,7 @@
         id: String(p.id || ''),
         first_name: String(p.first_name || '').trim(),
         last_name: String(p.last_name || '').trim(),
-        name: String(p.name || '').trim(),
-        email: String(p.email || '').trim(),
-        phone: String(p.phone || '').trim(),
-        phone_digits: String(p.phone_digits || digitsOnly(p.phone || '')).trim()
+        name: String(p.name || '').trim()
       };
     }
 
@@ -483,7 +476,6 @@
 
     function applyFilter(query){
       const q = String(query || '').trim().toLowerCase();
-      const qDigits = digitsOnly(q);
 
       if (!q){
         filteredPeople = [];
@@ -492,11 +484,7 @@
       }
 
       filteredPeople = allPeople.filter(p => {
-        const nameMatch = String(p.last_name || '').toLowerCase().includes(q);
-        const emailMatch = String(p.email || '').toLowerCase().includes(q);
-        const phoneMatch = qDigits ? String(p.phone_digits || '').includes(qDigits) : false;
-
-        return nameMatch || emailMatch || phoneMatch;
+        return String(p.last_name || '').toLowerCase().includes(q);
       });
 
       renderResults();
