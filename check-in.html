@@ -23,7 +23,13 @@
     }
 
     *{box-sizing:border-box}
-    html,body{margin:0;padding:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--text)}
+    html,body{
+      margin:0;
+      padding:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
     body{
       background:
@@ -141,6 +147,13 @@
       transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease;
     }
 
+    .service-btn:hover,
+    .utility-btn:hover,
+    .submit-btn:hover,
+    .name-chip:hover{
+      transform:translateY(-1px);
+    }
+
     .service-btn{
       min-height:58px;
       border-radius:16px;
@@ -186,6 +199,12 @@
       max-height:340px;
       overflow:auto;
       min-height:120px;
+    }
+
+    .empty-state{
+      color:var(--muted);
+      line-height:1.6;
+      padding:12px 4px;
     }
 
     .check-row{
@@ -257,6 +276,7 @@
 
     .utility-btn.secondary{background:#2563eb}
     .utility-btn.teal{background:#0f766e}
+    .utility-btn.gold{background:#b7791f}
 
     .submit-btn{
       width:100%;
@@ -275,12 +295,35 @@
       margin-top:14px;
       font-size:1rem;
       font-weight:700;
+      line-height:1.5;
     }
 
     .ok{color:var(--success)}
     .err{color:var(--error)}
     .muted{color:var(--muted)}
     .hint{color:var(--muted);line-height:1.6;font-size:1rem}
+
+    .backend-error{
+      display:none;
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(176,0,32,.15);
+      background:rgba(176,0,32,.05);
+      color:var(--error);
+      font-weight:700;
+      line-height:1.55;
+    }
+
+    .backend-error.show{display:block}
+
+    .backend-error small{
+      display:block;
+      color:#7a1f2b;
+      font-weight:400;
+      margin-top:6px;
+      word-break:break-word;
+    }
 
     .success-screen{
       display:none;
@@ -346,13 +389,20 @@
       <div class="results-wrap">
         <div class="box">
           <h2>Results</h2>
-          <div id="results" class="list"></div>
+          <div id="results" class="list">
+            <div class="empty-state">Loading people list...</div>
+          </div>
+
           <div class="utility-row">
             <button id="selectPage" type="button" class="utility-btn teal">Select All Shown</button>
             <button id="addSelected" type="button" class="utility-btn secondary">Add Selected</button>
             <button id="clearSearch" type="button" class="utility-btn">Clear Search</button>
+            <button id="retryLoad" type="button" class="utility-btn gold">Retry Load</button>
           </div>
+
           <div class="hint" style="margin-top:14px;">Search by last name, then tap Add Selected.</div>
+
+          <div id="backendError" class="backend-error"></div>
         </div>
 
         <div class="box">
@@ -361,9 +411,11 @@
           <div id="selectedHint" class="hint">No one selected yet.</div>
 
           <button id="submitBtn" class="submit-btn" type="button">Submit Check-In</button>
+
           <div class="utility-row">
             <button id="clearSelected" type="button" class="utility-btn">Clear Selected</button>
           </div>
+
           <div id="status" class="status"></div>
         </div>
       </div>
@@ -387,11 +439,14 @@
     const successScreen = document.getElementById('successScreen');
     const mainPanel = document.getElementById('mainPanel');
     const successText = document.getElementById('successText');
+    const backendErrorEl = document.getElementById('backendError');
+
     const clearSearchBtn = document.getElementById('clearSearch');
     const clearSelectedBtn = document.getElementById('clearSelected');
     const submitBtn = document.getElementById('submitBtn');
     const selectPageBtn = document.getElementById('selectPage');
     const addSelectedBtn = document.getElementById('addSelected');
+    const retryLoadBtn = document.getElementById('retryLoad');
 
     let selected = new Map();
     let selectedService = 'Traditional Worship';
@@ -400,7 +455,7 @@
     let filteredPeople = [];
 
     function escapeHtml(s){
-      return String(s || '').replace(/[&<>\"']/g, m => ({
+      return String(s || '').replace(/[&<>"']/g, m => ({
         '&':'&amp;',
         '<':'&lt;',
         '>':'&gt;',
@@ -414,6 +469,24 @@
       statusEl.textContent = message || '';
     }
 
+    function showBackendError(message, detail = ''){
+      if (!message) {
+        backendErrorEl.classList.remove('show');
+        backendErrorEl.innerHTML = '';
+        return;
+      }
+
+      backendErrorEl.innerHTML = `
+        ${escapeHtml(message)}
+        ${detail ? `<small>${escapeHtml(detail)}</small>` : ''}
+      `;
+      backendErrorEl.classList.add('show');
+    }
+
+    function showEmpty(message){
+      resultsEl.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+    }
+
     document.querySelectorAll('.service-btn').forEach(btn => {
       btn.onclick = () => {
         document.querySelectorAll('.service-btn').forEach(b => b.classList.remove('active'));
@@ -424,6 +497,7 @@
 
     async function apiCall(payload){
       const formData = new URLSearchParams();
+
       Object.keys(payload).forEach(key => {
         const value = typeof payload[key] === 'object'
           ? JSON.stringify(payload[key])
@@ -458,27 +532,35 @@
       };
     }
 
-    async function loadPeople(){
-      resultsEl.innerHTML = 'Loading...';
+    async function loadPeople(forceRefresh = false){
+      showEmpty('Loading people list...');
+      showBackendError('');
       setStatus('Loading people list...');
 
-      try{
-        const res = await apiGetPeople(false);
+      try {
+        const res = await apiGetPeople(forceRefresh);
 
-        if (!res || !res.ok){
-          resultsEl.innerHTML = 'People list unavailable.';
+        if (!res || !res.ok) {
+          allPeople = [];
+          filteredPeople = [];
+          showEmpty('People list unavailable.');
           setStatus(res?.error || 'Failed to load people list.', 'err');
+          showBackendError('Backend returned an error.', res?.error || '');
           return;
         }
 
         allPeople = Array.isArray(res.rows) ? res.rows.map(normalizePerson) : [];
         filteredPeople = [];
-        resultsEl.innerHTML = '';
+        renderResults();
         setStatus(`Loaded ${allPeople.length} active people.`, 'ok');
-      } catch(e){
+        showBackendError('');
+      } catch (e) {
         console.error(e);
-        resultsEl.innerHTML = 'People list unavailable.';
+        allPeople = [];
+        filteredPeople = [];
+        showEmpty('People list unavailable.');
         setStatus('Failed to load people list.', 'err');
+        showBackendError('Could not reach the attendance backend.', e.message || '');
       }
     }
 
@@ -502,8 +584,18 @@
     function renderResults(){
       resultsEl.innerHTML = '';
 
+      if (!allPeople.length) {
+        showEmpty('People list unavailable.');
+        return;
+      }
+
+      if (!qEl.value.trim()) {
+        showEmpty('Type a last name to begin searching.');
+        return;
+      }
+
       if (!filteredPeople.length){
-        resultsEl.innerHTML = qEl.value.trim() ? 'No matches found.' : '';
+        showEmpty('No matches found.');
         return;
       }
 
@@ -522,9 +614,12 @@
     }
 
     function selectAllShown(){
-      resultsEl.querySelectorAll('input[type="checkbox"]').forEach(cb => {
-        cb.checked = true;
-      });
+      const boxes = resultsEl.querySelectorAll('input[type="checkbox"]');
+      if (!boxes.length) {
+        setStatus('No names are currently shown.', 'err');
+        return;
+      }
+      boxes.forEach(cb => cb.checked = true);
       setStatus('All shown names selected.', 'ok');
     }
 
@@ -548,6 +643,7 @@
 
     function renderSelected(){
       selectedEl.innerHTML = '';
+
       if (!selected.size){
         selectedHintEl.style.display = '';
         return;
@@ -558,6 +654,7 @@
       selected.forEach(p => {
         const chip = document.createElement('button');
         chip.className = 'name-chip';
+        chip.type = 'button';
         chip.textContent = p.name + ' ×';
         chip.onclick = () => {
           selected.delete(String(p.id));
@@ -587,6 +684,7 @@
       const iso = `${yyyy}-${mm}-${dd}`;
 
       setStatus('Submitting...');
+      showBackendError('');
 
       try{
         const res = await apiCall({
@@ -605,11 +703,13 @@
           setTimeout(resetKiosk, 5000);
         } else {
           setStatus(res?.error || 'Submit failed', 'err');
+          showBackendError('Submission failed.', res?.error || '');
           alert(res?.error || 'Submit failed');
         }
       } catch(e){
         console.error(e);
         setStatus('Submit failed', 'err');
+        showBackendError('Could not submit attendance.', e.message || '');
         alert(e.message || 'Submit failed');
       }
     }
@@ -623,6 +723,7 @@
       successScreen.classList.remove('show');
       mainPanel.style.display = '';
       setStatus('');
+      showBackendError('');
       qEl.focus();
     }
 
@@ -643,6 +744,7 @@
     selectPageBtn.onclick = selectAllShown;
     addSelectedBtn.onclick = addCheckedPeople;
     submitBtn.onclick = submitAttendance;
+    retryLoadBtn.onclick = () => loadPeople(true);
 
     qEl.addEventListener('input', () => {
       clearTimeout(debounceTimer);
