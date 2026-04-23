@@ -1,0 +1,440 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>VUMC Kids Check-In</title>
+
+  <style>
+    :root{
+      --navy:#16324f;
+      --blue:#2c7be5;
+      --teal:#1fb6aa;
+      --gold:#f2c94c;
+      --bg:#eef3f8;
+      --card:rgba(255,255,255,.95);
+      --text:#1f2937;
+      --muted:#667085;
+      --border:rgba(15,23,42,.10);
+      --shadow:0 18px 45px rgba(16,24,40,.10);
+      --radius:24px;
+      --max:1120px;
+    }
+
+    *{box-sizing:border-box}
+    html{scroll-behavior:smooth}
+
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      color:var(--text);
+      background:
+        radial-gradient(circle at top left, rgba(44,123,229,.10), transparent 28%),
+        radial-gradient(circle at top right, rgba(31,182,170,.12), transparent 32%),
+        linear-gradient(180deg,#eef3f9 0%,#f6f8fb 45%,#edf2f7 100%);
+    }
+
+    a{text-decoration:none;color:inherit}
+
+    .topbar{
+      position:sticky;
+      top:0;
+      z-index:50;
+      backdrop-filter:blur(14px);
+      background:rgba(255,255,255,.82);
+      border-bottom:1px solid rgba(22,50,79,.08);
+    }
+
+    .topbar-inner,
+    .hero-inner,
+    .section{
+      width:min(var(--max), calc(100% - 32px));
+      margin:0 auto;
+    }
+
+    .topbar-inner{
+      min-height:74px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      min-width:0;
+    }
+
+    .brand-mark{
+      width:48px;
+      height:48px;
+      border-radius:14px;
+      background:linear-gradient(135deg, var(--blue), var(--teal));
+      display:grid;
+      place-items:center;
+      color:#fff;
+      font-weight:700;
+      box-shadow:0 10px 24px rgba(44,123,229,.22);
+      flex:0 0 auto;
+    }
+
+    .brand-kicker{
+      font-size:12px;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+      color:var(--muted);
+      margin-bottom:4px;
+    }
+
+    .brand-title{
+      font-size:22px;
+      font-weight:700;
+      color:var(--navy);
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+    }
+
+    .nav{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      flex-wrap:wrap;
+      justify-content:flex-end;
+    }
+
+    .nav a{
+      padding:10px 14px;
+      border-radius:999px;
+      font-size:15px;
+      color:var(--navy);
+      transition:.2s ease;
+    }
+
+    .nav a:hover,
+    .nav a:focus{
+      background:rgba(44,123,229,.08);
+      outline:none;
+    }
+
+    .nav .cta{
+      background:var(--gold);
+      color:#1b1b1b;
+      font-weight:700;
+      box-shadow:0 10px 24px rgba(242,201,76,.28);
+    }
+
+    .hero{
+      padding:28px 0 20px;
+    }
+
+    .hero-shell{
+      background:linear-gradient(135deg, rgba(44,123,229,.95), rgba(74,108,247,.90) 45%, rgba(31,182,170,.88));
+      border-radius:32px;
+      box-shadow:var(--shadow);
+      padding:42px 28px;
+      overflow:hidden;
+      border:1px solid rgba(255,255,255,.18);
+      position:relative;
+    }
+
+    .hero-shell::before,
+    .hero-shell::after{
+      content:"";
+      position:absolute;
+      border-radius:50%;
+      background:rgba(255,255,255,.10);
+      pointer-events:none;
+    }
+
+    .hero-shell::before{
+      width:260px;
+      height:260px;
+      left:-30px;
+      bottom:-130px;
+    }
+
+    .hero-shell::after{
+      width:220px;
+      height:220px;
+      right:-30px;
+      top:-60px;
+    }
+
+    .hero-inner{
+      position:relative;
+      z-index:1;
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:24px;
+      align-items:center;
+    }
+
+    .hero-copy h1{
+      margin:0 0 12px;
+      color:#fff;
+      font-size:clamp(2rem, 4vw, 3.4rem);
+      line-height:1.03;
+      letter-spacing:-.02em;
+    }
+
+    .hero-copy p{
+      margin:0;
+      color:rgba(255,255,255,.92);
+      line-height:1.7;
+      font-size:1rem;
+      max-width:620px;
+    }
+
+    .hero-badges{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-bottom:18px;
+    }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:10px 14px;
+      border-radius:999px;
+      background:rgba(255,255,255,.16);
+      color:#fff;
+      border:1px solid rgba(255,255,255,.18);
+      font-size:14px;
+    }
+
+    .hero-panel{
+      background:rgba(255,255,255,.14);
+      border:1px solid rgba(255,255,255,.22);
+      border-radius:22px;
+      padding:22px;
+      color:#fff;
+      backdrop-filter:blur(8px);
+    }
+
+    .hero-panel h2{
+      margin:0 0 10px;
+      font-size:1.15rem;
+    }
+
+    .hero-panel p,
+    .hero-panel li{
+      margin:0;
+      line-height:1.65;
+      color:rgba(255,255,255,.92);
+      font-size:.96rem;
+    }
+
+    .hero-panel ul{
+      margin:12px 0 0;
+      padding-left:18px;
+    }
+
+    .section{
+      padding:0 0 28px;
+    }
+
+    .section-card{
+      background:var(--card);
+      border:1px solid var(--border);
+      border-radius:var(--radius);
+      box-shadow:var(--shadow);
+      padding:28px;
+    }
+
+    .content-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:18px;
+    }
+
+    .card{
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:18px;
+      padding:20px;
+      background:#fff;
+      min-height:180px;
+    }
+
+    .card h3{
+      margin:0 0 10px;
+      color:var(--navy);
+      font-size:1.25rem;
+    }
+
+    .card p,
+    .card li{
+      color:var(--text);
+      line-height:1.7;
+      margin:0;
+    }
+
+    .card ul{
+      margin:12px 0 0;
+      padding-left:20px;
+    }
+
+    .checkin-wrap{
+      display:flex;
+      flex-direction:column;
+      justify-content:center;
+      align-items:flex-start;
+      gap:16px;
+      min-height:100%;
+    }
+
+    .kids-btn{
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      min-height:64px;
+      padding:16px 26px;
+      border:none;
+      border-radius:18px;
+      background:linear-gradient(135deg, var(--blue), var(--teal));
+      color:#fff;
+      font-size:1.15rem;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 14px 28px rgba(44,123,229,.20);
+      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+    }
+
+    .kids-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .muted{
+      color:var(--muted);
+    }
+
+    @media (max-width: 900px){
+      .hero-inner,
+      .content-grid{
+        grid-template-columns:1fr;
+      }
+    }
+
+    @media (max-width: 760px){
+      .topbar-inner{
+        align-items:flex-start;
+        flex-direction:column;
+        padding:14px 0;
+      }
+
+      .nav{
+        width:100%;
+        justify-content:flex-start;
+      }
+
+      .hero-shell,
+      .section-card{
+        padding:22px;
+        border-radius:24px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="topbar-inner">
+      <a aria-label="Ministry Connect Home" class="brand" href="/">
+        <div class="brand-mark">MC</div>
+        <div>
+          <div class="brand-kicker">VUMC Workspace</div>
+          <div class="brand-title">Ministry Connect</div>
+        </div>
+      </a>
+
+      <nav class="nav" aria-label="Primary">
+        <a href="/">Home</a>
+        <a href="/attendance">Attendance</a>
+        <a class="cta" href="/#tools">Back to Tools</a>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="hero-inner hero-shell">
+        <div class="hero-copy">
+          <div class="hero-badges">
+            <span class="hero-badge">VUMC Kids</span>
+            <span class="hero-badge">Church Center Form</span>
+            <span class="hero-badge">Family Check-In</span>
+          </div>
+          <h1>VUMC Kids Check-In</h1>
+          <p>
+            Use this page to open the VUMC Kids Check-In form for families and children. This keeps the process simple, quick, and easy to access from Ministry Connect.
+          </p>
+        </div>
+
+        <aside class="hero-panel" aria-label="Kids Check-In Info">
+          <h2>How this works</h2>
+          <ul>
+            <li>Tap the Kids Check-In button.</li>
+            <li>The Church Center form opens in a modal.</li>
+            <li>Complete the check-in details for the child or family.</li>
+            <li>Close the modal when finished to return here.</li>
+          </ul>
+        </aside>
+      </div>
+    </section>
+
+    <section class="section">
+      <div class="section-card">
+        <div class="content-grid">
+          <div class="card">
+            <h3>Kids Check-In</h3>
+            <div class="checkin-wrap">
+              <p>
+                Open the secure Church Center form for VUMC Kids Check-In.
+              </p>
+
+              <button
+                type="button"
+                class="kids-btn"
+                data-open-form="https://versaillesumc.churchcenter.com/people/forms/1051069">
+                VUMC Kids Check-In
+              </button>
+
+              <p class="muted">
+                This opens inside a Church Center modal so families stay in the same experience.
+              </p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3>Helpful Notes</h3>
+            <ul>
+              <li>Best for nursery, children’s ministry, and family ministry check-in.</li>
+              <li>Keep this page available on kiosk, tablet, or front desk screen.</li>
+              <li>You can also add this same button to your main index page next.</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://js.churchcenter.com/modal/v1"></script>
+  <script>
+    document.querySelectorAll('[data-open-form]').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const url = btn.getAttribute('data-open-form');
+        if (window.ChurchCenter && window.ChurchCenter.Modal) {
+          const modal = new window.ChurchCenter.Modal(url);
+          modal.open();
+        } else {
+          window.open(url, '_blank');
+        }
+      });
+    });
+  </script>
+</body>
+</html>
