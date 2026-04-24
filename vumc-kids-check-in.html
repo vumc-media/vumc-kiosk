@@ -306,11 +306,6 @@
       padding:10px 14px;
       font-size:1rem;
       font-weight:700;
-      transition:transform .15s ease, box-shadow .15s ease;
-    }
-
-    .name-chip:hover{
-      transform:translateY(-1px);
     }
 
     .utility-row{
@@ -325,12 +320,6 @@
       font-family:inherit;
       border:none;
       cursor:pointer;
-      transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease;
-    }
-
-    .utility-btn:hover,
-    .submit-btn:hover{
-      transform:translateY(-1px);
     }
 
     .utility-btn{
@@ -427,6 +416,19 @@
       line-height:1.6;
     }
 
+    .pickup-code{
+      display:inline-block;
+      margin:14px 0 8px;
+      padding:14px 24px;
+      border-radius:18px;
+      background:#f0f9f2;
+      border:1px solid #cfe8d6;
+      color:#14532d;
+      font-size:2.2rem;
+      font-weight:800;
+      letter-spacing:.12em;
+    }
+
     @media (max-width:980px){
       .toolbar,.results-wrap{grid-template-columns:1fr}
       .toolbar-actions{justify-content:flex-start}
@@ -486,7 +488,6 @@
           </div>
 
           <div class="hint" style="margin-top:14px;">You can search or scroll the full children’s list, then tap Add Selected.</div>
-
           <div id="backendError" class="backend-error"></div>
         </div>
 
@@ -771,10 +772,15 @@
         });
 
         if (res.ok){
-          successText.textContent = `${people.length} ${people.length === 1 ? 'child has' : 'children have'} been checked in on ${iso}.`;
+          const code = res.pickupCode || 'N/A';
+          successText.innerHTML = `
+            ${people.length} ${people.length === 1 ? 'child has' : 'children have'} been checked in on ${iso}.<br>
+            <span class="pickup-code">${escapeHtml(code)}</span><br>
+            <span style="color:#667085;font-size:.95rem;">Please remember this pickup code.</span>
+          `;
           mainPanel.style.display = 'none';
           successScreen.classList.add('show');
-          setTimeout(resetKiosk, 5000);
+          setTimeout(resetKiosk, 8000);
         } else {
           setStatus(res?.error || 'Submit failed', 'err');
           showBackendError('Submission failed.', res?.error || '');
