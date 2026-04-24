@@ -1,147 +1,137 @@
 <!doctype html>
 <html lang="en">
 <head>
+ 
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>VUMC Kids Check-In</title>
-
   <style>
     :root{
       --navy:#16324f;
       --blue:#2c7be5;
       --teal:#1fb6aa;
       --gold:#f2c94c;
-      --bg:#eef3f8;
-      --card:rgba(255,255,255,.95);
+      --bg:#eef3f9;
+      --card:#ffffff;
       --text:#1f2937;
       --muted:#667085;
       --border:rgba(15,23,42,.10);
       --shadow:0 18px 45px rgba(16,24,40,.10);
+      --success:#0a7a2a;
+      --error:#b00020;
       --radius:24px;
-      --max:1120px;
+      --max:1100px;
     }
 
     *{box-sizing:border-box}
-    html{scroll-behavior:smooth}
+    html,body{
+      margin:0;
+      padding:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:var(--bg);
+      color:var(--text);
+    }
 
     body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      color:var(--text);
       background:
         radial-gradient(circle at top left, rgba(44,123,229,.10), transparent 28%),
         radial-gradient(circle at top right, rgba(31,182,170,.12), transparent 32%),
         linear-gradient(180deg,#eef3f9 0%,#f6f8fb 45%,#edf2f7 100%);
     }
 
-    a{text-decoration:none;color:inherit}
-
     .topbar{
       position:sticky;
       top:0;
-      z-index:50;
-      backdrop-filter:blur(14px);
-      background:rgba(255,255,255,.82);
-      border-bottom:1px solid rgba(22,50,79,.08);
-    }
-
-    .topbar-inner,
-    .hero-inner,
-    .section{
-      width:min(var(--max), calc(100% - 32px));
-      margin:0 auto;
+      z-index:100;
+      backdrop-filter:blur(12px);
+      background:rgba(255,255,255,.85);
+      border-bottom:1px solid var(--border);
     }
 
     .topbar-inner{
-      min-height:74px;
+      width:min(var(--max), calc(100% - 28px));
+      margin:0 auto;
+      min-height:64px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      gap:18px;
+      gap:16px;
     }
 
     .brand{
       display:flex;
       align-items:center;
-      gap:14px;
-      min-width:0;
+      gap:10px;
     }
 
-    .brand-mark{
-      width:48px;
-      height:48px;
-      border-radius:14px;
-      background:linear-gradient(135deg, var(--blue), var(--teal));
+    .brand-badge{
+      width:36px;
+      height:36px;
+      border-radius:10px;
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+      color:#fff;
       display:grid;
       place-items:center;
-      color:#fff;
       font-weight:700;
-      box-shadow:0 10px 24px rgba(44,123,229,.22);
       flex:0 0 auto;
     }
 
     .brand-kicker{
-      font-size:12px;
-      letter-spacing:.12em;
+      font-size:11px;
       text-transform:uppercase;
+      letter-spacing:.12em;
       color:var(--muted);
-      margin-bottom:4px;
+      margin-bottom:2px;
     }
 
     .brand-title{
-      font-size:22px;
+      font-size:1rem;
       font-weight:700;
       color:var(--navy);
-      white-space:nowrap;
-      overflow:hidden;
-      text-overflow:ellipsis;
     }
 
     .nav{
       display:flex;
-      align-items:center;
-      gap:10px;
+      gap:8px;
       flex-wrap:wrap;
-      justify-content:flex-end;
     }
 
     .nav a{
-      padding:10px 14px;
+      padding:8px 12px;
       border-radius:999px;
-      font-size:15px;
+      font-size:.95rem;
+      text-decoration:none;
       color:var(--navy);
-      transition:.2s ease;
+      transition:.2s;
     }
 
-    .nav a:hover,
-    .nav a:focus{
+    .nav a:hover{
       background:rgba(44,123,229,.08);
-      outline:none;
     }
 
-    .nav .cta{
-      background:var(--gold);
-      color:#1b1b1b;
-      font-weight:700;
-      box-shadow:0 10px 24px rgba(242,201,76,.28);
+    .nav a.active{
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+      color:#fff;
+    }
+
+    .wrap{
+      width:min(var(--max), calc(100% - 28px));
+      margin:0 auto;
+      padding:18px 0 32px;
     }
 
     .hero{
-      padding:28px 0 20px;
-    }
-
-    .hero-shell{
       background:linear-gradient(135deg, rgba(44,123,229,.95), rgba(74,108,247,.90) 45%, rgba(31,182,170,.88));
+      color:#fff;
       border-radius:32px;
+      padding:30px 24px;
       box-shadow:var(--shadow);
-      padding:42px 28px;
-      overflow:hidden;
-      border:1px solid rgba(255,255,255,.18);
+      margin-bottom:18px;
       position:relative;
+      overflow:hidden;
     }
 
-    .hero-shell::before,
-    .hero-shell::after{
+    .hero::before,.hero::after{
       content:"";
       position:absolute;
       border-radius:50%;
@@ -149,293 +139,693 @@
       pointer-events:none;
     }
 
-    .hero-shell::before{
-      width:260px;
-      height:260px;
-      left:-30px;
-      bottom:-130px;
-    }
+    .hero::before{width:220px;height:220px;left:-50px;bottom:-120px}
+    .hero::after{width:180px;height:180px;right:-40px;top:-70px}
 
-    .hero-shell::after{
-      width:220px;
-      height:220px;
-      right:-30px;
-      top:-60px;
-    }
-
-    .hero-inner{
+    .hero h1{
       position:relative;
       z-index:1;
-      display:grid;
-      grid-template-columns:1.1fr .9fr;
-      gap:24px;
-      align-items:center;
+      margin:0 0 8px;
+      font-size:clamp(2rem,4vw,3.2rem);
+      line-height:1.02;
     }
 
-    .hero-copy h1{
-      margin:0 0 12px;
-      color:#fff;
-      font-size:clamp(2rem, 4vw, 3.4rem);
-      line-height:1.03;
-      letter-spacing:-.02em;
-    }
-
-    .hero-copy p{
+    .hero p{
+      position:relative;
+      z-index:1;
       margin:0;
+      font-size:1.05rem;
+      line-height:1.6;
       color:rgba(255,255,255,.92);
-      line-height:1.7;
-      font-size:1rem;
-      max-width:620px;
+      max-width:760px;
     }
 
-    .hero-badges{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      margin-bottom:18px;
-    }
-
-    .hero-badge{
-      display:inline-flex;
-      align-items:center;
-      gap:8px;
-      padding:10px 14px;
-      border-radius:999px;
-      background:rgba(255,255,255,.16);
-      color:#fff;
-      border:1px solid rgba(255,255,255,.18);
-      font-size:14px;
-    }
-
-    .hero-panel{
-      background:rgba(255,255,255,.14);
-      border:1px solid rgba(255,255,255,.22);
-      border-radius:22px;
-      padding:22px;
-      color:#fff;
-      backdrop-filter:blur(8px);
-    }
-
-    .hero-panel h2{
-      margin:0 0 10px;
-      font-size:1.15rem;
-    }
-
-    .hero-panel p,
-    .hero-panel li{
-      margin:0;
-      line-height:1.65;
-      color:rgba(255,255,255,.92);
-      font-size:.96rem;
-    }
-
-    .hero-panel ul{
-      margin:12px 0 0;
-      padding-left:18px;
-    }
-
-    .section{
-      padding:0 0 28px;
-    }
-
-    .section-card{
-      background:var(--card);
+    .panel{
+      background:rgba(255,255,255,.94);
       border:1px solid var(--border);
       border-radius:var(--radius);
       box-shadow:var(--shadow);
-      padding:28px;
-    }
-
-    .content-grid{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:18px;
-    }
-
-    .card{
-      border:1px solid rgba(15,23,42,.08);
-      border-radius:18px;
       padding:20px;
-      background:#fff;
-      min-height:180px;
     }
 
-    .card h3{
-      margin:0 0 10px;
+    .section-title{
+      font-size:1.35rem;
+      font-weight:700;
+      color:var(--navy);
+      margin:0 0 8px;
+    }
+
+    .subline{
+      margin:0 0 14px;
+      color:var(--muted);
+      font-size:1rem;
+    }
+
+    .toolbar{
+      display:grid;
+      grid-template-columns:1fr auto;
+      gap:12px;
+      align-items:center;
+      margin-bottom:16px;
+    }
+
+    .search{
+      width:100%;
+      min-height:58px;
+      border-radius:16px;
+      border:2px solid rgba(44,123,229,.22);
+      background:#fff;
+      color:var(--text);
+      font:inherit;
+      font-size:1.35rem;
+      padding:12px 16px;
+      outline:none;
+    }
+
+    .search:focus{
+      border-color:rgba(44,123,229,.60);
+      box-shadow:0 0 0 4px rgba(44,123,229,.10);
+    }
+
+    .toolbar-actions{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+
+    .results-wrap{
+      display:grid;
+      grid-template-columns:1.1fr .9fr;
+      gap:16px;
+      margin-top:6px;
+    }
+
+    .box{
+      background:#fff;
+      border:1px solid rgba(15,23,42,.08);
+      border-radius:20px;
+      padding:16px;
+      min-height:420px;
+    }
+
+    .box h2{
+      margin:0 0 12px;
       color:var(--navy);
       font-size:1.25rem;
     }
 
-    .card p,
-    .card li{
-      color:var(--text);
-      line-height:1.7;
-      margin:0;
-    }
-
-    .card ul{
-      margin:12px 0 0;
-      padding-left:20px;
-    }
-
-    .checkin-wrap{
+    .list{
       display:flex;
       flex-direction:column;
-      justify-content:center;
-      align-items:flex-start;
-      gap:16px;
-      min-height:100%;
+      gap:8px;
+      max-height:440px;
+      overflow:auto;
+      min-height:220px;
+      padding-right:4px;
     }
 
-    .kids-btn{
-      display:inline-flex;
+    .empty-state{
+      color:var(--muted);
+      line-height:1.6;
+      padding:12px 4px;
+    }
+
+    .check-row{
+      display:flex;
       align-items:center;
-      justify-content:center;
-      gap:10px;
-      min-height:64px;
-      padding:16px 26px;
-      border:none;
-      border-radius:18px;
-      background:linear-gradient(135deg, var(--blue), var(--teal));
-      color:#fff;
-      font-size:1.15rem;
-      font-weight:700;
-      cursor:pointer;
-      box-shadow:0 14px 28px rgba(44,123,229,.20);
-      transition:transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+      gap:12px;
+      padding:14px;
+      border:1px solid rgba(15,23,42,.10);
+      background:#fff;
+      border-radius:16px;
     }
 
-    .kids-btn:hover{
+    .check-row input[type="checkbox"]{
+      width:22px;
+      height:22px;
+      accent-color:#2c7be5;
+      flex:0 0 auto;
+    }
+
+    .person-text{
+      display:flex;
+      flex-direction:column;
+      min-width:0;
+    }
+
+    .person-text strong{
+      color:var(--navy);
+      font-size:1rem;
+    }
+
+    .person-text small{
+      color:var(--muted);
+      font-size:.92rem;
+      white-space:nowrap;
+      overflow:hidden;
+      text-overflow:ellipsis;
+      max-width:100%;
+    }
+
+    .selected-chips{
+      display:flex;
+      flex-wrap:wrap;
+      gap:10px;
+      min-height:46px;
+      margin-bottom:14px;
+    }
+
+    .name-chip{
+      font-family:inherit;
+      border:none;
+      cursor:pointer;
+      background:#f0f9f2;
+      color:#14532d;
+      border:1px solid #cfe8d6;
+      border-radius:999px;
+      padding:10px 14px;
+      font-size:1rem;
+      font-weight:700;
+      transition:transform .15s ease, box-shadow .15s ease;
+    }
+
+    .name-chip:hover{
       transform:translateY(-1px);
     }
 
-    .muted{
+    .utility-row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      margin-top:14px;
+    }
+
+    .utility-btn,
+    .submit-btn{
+      font-family:inherit;
+      border:none;
+      cursor:pointer;
+      transition:transform .15s ease,opacity .15s ease,box-shadow .15s ease;
+    }
+
+    .utility-btn:hover,
+    .submit-btn:hover{
+      transform:translateY(-1px);
+    }
+
+    .utility-btn{
+      min-height:50px;
+      padding:12px 16px;
+      border-radius:14px;
+      font-size:1rem;
+      font-weight:700;
+      background:#6b7280;
+      color:#fff;
+    }
+
+    .utility-btn.secondary{background:#2563eb}
+    .utility-btn.teal{background:#0f766e}
+    .utility-btn.gold{background:#b7791f}
+
+    .submit-btn{
+      width:100%;
+      min-height:66px;
+      border-radius:18px;
+      background:linear-gradient(135deg,var(--blue),var(--teal));
+      color:#fff;
+      font-size:1.2rem;
+      font-weight:700;
+      box-shadow:0 14px 28px rgba(44,123,229,.20);
+      margin-top:16px;
+    }
+
+    .status{
+      min-height:28px;
+      margin-top:14px;
+      font-size:1rem;
+      font-weight:700;
+      line-height:1.5;
+    }
+
+    .ok{color:var(--success)}
+    .err{color:var(--error)}
+    .hint{color:var(--muted);line-height:1.6;font-size:1rem}
+
+    .backend-error{
+      display:none;
+      margin-top:14px;
+      padding:14px 16px;
+      border-radius:16px;
+      border:1px solid rgba(176,0,32,.15);
+      background:rgba(176,0,32,.05);
+      color:var(--error);
+      font-weight:700;
+      line-height:1.55;
+    }
+
+    .backend-error.show{display:block}
+
+    .backend-error small{
+      display:block;
+      color:#7a1f2b;
+      font-weight:400;
+      margin-top:6px;
+      word-break:break-word;
+    }
+
+    .success-screen{
+      display:none;
+      text-align:center;
+      padding:30px 16px 10px;
+    }
+
+    .success-screen.show{display:block}
+
+    .success-icon{
+      width:92px;
+      height:92px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      margin:0 auto 16px;
+      background:linear-gradient(135deg, rgba(15,118,110,.14), rgba(34,197,94,.18));
+      color:#0f766e;
+      font-size:2.4rem;
+      font-weight:700;
+    }
+
+    .success-screen h2{
+      margin:0 0 10px;
+      font-size:2rem;
+      color:var(--navy);
+    }
+
+    .success-screen p{
+      margin:0 0 18px;
       color:var(--muted);
+      font-size:1.05rem;
+      line-height:1.6;
     }
 
-    @media (max-width: 900px){
-      .hero-inner,
-      .content-grid{
-        grid-template-columns:1fr;
-      }
-    }
-
-    @media (max-width: 760px){
-      .topbar-inner{
-        align-items:flex-start;
-        flex-direction:column;
-        padding:14px 0;
-      }
-
-      .nav{
-        width:100%;
-        justify-content:flex-start;
-      }
-
-      .hero-shell,
-      .section-card{
-        padding:22px;
-        border-radius:24px;
-      }
+    @media (max-width:980px){
+      .toolbar,.results-wrap{grid-template-columns:1fr}
+      .toolbar-actions{justify-content:flex-start}
+      .topbar-inner{align-items:flex-start; padding:10px 0;}
+      .nav{justify-content:flex-start}
     }
   </style>
 </head>
 <body>
   <header class="topbar">
     <div class="topbar-inner">
-      <a aria-label="Ministry Connect Home" class="brand" href="/">
-        <div class="brand-mark">MC</div>
+      <div class="brand">
+        <div class="brand-badge">V</div>
         <div>
-          <div class="brand-kicker">VUMC Workspace</div>
-          <div class="brand-title">Ministry Connect</div>
+          <div class="brand-kicker">VUMC Kiosk</div>
+          <div class="brand-title">Kids Check-In</div>
         </div>
-      </a>
+      </div>
 
-      <nav class="nav" aria-label="Primary">
-        <a href="/">Home</a>
-        <a href="/check-in.html">Check-In</a>
-        <a href="/event-signups.html">Events</a>
-        <a class="cta" href="/#tools">Back to Tools</a>
+      <nav class="nav">
+        <a href="index.html">Home</a>
+        <a href="check-in.html">Check In</a>
+        <a href="vumc-kids-check-in.html" class="active">Kids Check-In</a>
+        <a href="event-signups.html">Event Signups</a>
       </nav>
     </div>
   </header>
 
-  <main>
+  <div class="wrap">
     <section class="hero">
-      <div class="hero-inner hero-shell">
-        <div class="hero-copy">
-          <div class="hero-badges">
-            <span class="hero-badge">VUMC Kids</span>
-            <span class="hero-badge">Church Center Form</span>
-            <span class="hero-badge">Family Check-In</span>
-          </div>
-          <h1>VUMC Kids Check-In</h1>
-          <p>
-            Use this page to open the VUMC Kids Check-In form for families and children. This keeps the process simple, quick, and easy to access from Ministry Connect.
-          </p>
-        </div>
-
-        <aside class="hero-panel" aria-label="Kids Check-In Info">
-          <h2>How this works</h2>
-          <ul>
-            <li>Tap the Kids Check-In button.</li>
-            <li>The Church Center form opens in a modal.</li>
-            <li>Complete the check-in details for the child or family.</li>
-            <li>Close the modal when finished to return here.</li>
-          </ul>
-        </aside>
-      </div>
+      <h1>VUMC Kids Check-In</h1>
+      <p>Search by last name or scroll the children’s list, select one or more children, and submit.</p>
     </section>
 
-    <section class="section">
-      <div class="section-card">
-        <div class="content-grid">
-          <div class="card">
-            <h3>Kids Check-In</h3>
-            <div class="checkin-wrap">
-              <p>
-                Open the secure Church Center form for VUMC Kids Check-In.
-              </p>
+    <section class="panel" id="mainPanel">
+      <h2 class="section-title">Kids Check-In</h2>
+      <p class="subline">Date automatically uses today.</p>
 
-              <button
-                type="button"
-                class="kids-btn"
-                data-open-form="https://versaillesumc.churchcenter.com/people/forms/1051069">
-                VUMC Kids Check-In
-              </button>
+      <div class="toolbar">
+        <input id="q" class="search" type="search" placeholder="Search by last name" autocomplete="off" />
+        <div class="toolbar-actions">
+          <button id="retryLoad" type="button" class="utility-btn gold">Refresh List</button>
+        </div>
+      </div>
 
-              <p class="muted">
-                This opens inside a Church Center modal so families stay in the same experience.
-              </p>
-            </div>
+      <div class="results-wrap">
+        <div class="box">
+          <h2>Children</h2>
+          <div id="results" class="list">
+            <div class="empty-state">Loading children list...</div>
           </div>
 
-          <div class="card">
-            <h3>Helpful Notes</h3>
-            <ul>
-              <li>Best for nursery, children’s ministry, and family ministry check-in.</li>
-              <li>Keep this page available on kiosk, tablet, or front desk screen.</li>
-              <li>You can also add this same button to your main index page next.</li>
-            </ul>
+          <div class="utility-row">
+            <button id="selectPage" type="button" class="utility-btn teal">Select All Shown</button>
+            <button id="addSelected" type="button" class="utility-btn secondary">Add Selected</button>
+            <button id="clearSearch" type="button" class="utility-btn">Clear Search</button>
           </div>
+
+          <div class="hint" style="margin-top:14px;">You can search or scroll the full children’s list, then tap Add Selected.</div>
+
+          <div id="backendError" class="backend-error"></div>
+        </div>
+
+        <div class="box">
+          <h2>Selected</h2>
+          <div id="selected" class="selected-chips"></div>
+          <div id="selectedHint" class="hint">No children selected yet.</div>
+
+          <button id="submitBtn" class="submit-btn" type="button">Submit Kids Check-In</button>
+
+          <div class="utility-row">
+            <button id="clearSelected" type="button" class="utility-btn">Clear Selected</button>
+          </div>
+
+          <div id="status" class="status"></div>
         </div>
       </div>
     </section>
-  </main>
 
-  <script src="https://js.churchcenter.com/modal/v1"></script>
+    <section id="successScreen" class="panel success-screen">
+      <div class="success-icon">✓</div>
+      <h2>Kids Check-In Submitted</h2>
+      <p id="successText">Thank you. Kids check-in has been recorded.</p>
+    </section>
+  </div>
+
   <script>
-    document.querySelectorAll('[data-open-form]').forEach(btn => {
-      btn.addEventListener('click', () => {
-        const url = btn.getAttribute('data-open-form');
-        if (window.ChurchCenter && window.ChurchCenter.Modal) {
-          const modal = new window.ChurchCenter.Modal(url);
-          modal.open();
-        } else {
-          window.open(url, '_blank');
-        }
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwkn7gc4YiQ93wvL6dzazkzXkobZfGv6SjKQKgwLpawQwgaigB0Fal8-0WDOyG-RePj/exec";
+
+    const qEl = document.getElementById('q');
+    const resultsEl = document.getElementById('results');
+    const selectedEl = document.getElementById('selected');
+    const statusEl = document.getElementById('status');
+    const selectedHintEl = document.getElementById('selectedHint');
+    const successScreen = document.getElementById('successScreen');
+    const mainPanel = document.getElementById('mainPanel');
+    const successText = document.getElementById('successText');
+    const backendErrorEl = document.getElementById('backendError');
+
+    const clearSearchBtn = document.getElementById('clearSearch');
+    const clearSelectedBtn = document.getElementById('clearSelected');
+    const submitBtn = document.getElementById('submitBtn');
+    const selectPageBtn = document.getElementById('selectPage');
+    const addSelectedBtn = document.getElementById('addSelected');
+    const retryLoadBtn = document.getElementById('retryLoad');
+
+    let selected = new Map();
+    let debounceTimer = null;
+    let allPeople = [];
+    let filteredPeople = [];
+
+    function escapeHtml(s){
+      return String(s || '').replace(/[&<>"']/g, m => ({
+        '&':'&amp;',
+        '<':'&lt;',
+        '>':'&gt;',
+        '"':'&quot;',
+        "'":'&#39;'
+      }[m]));
+    }
+
+    function setStatus(message, kind = ''){
+      statusEl.className = 'status' + (kind ? ' ' + kind : '');
+      statusEl.textContent = message || '';
+    }
+
+    function showBackendError(message, detail = ''){
+      if (!message) {
+        backendErrorEl.classList.remove('show');
+        backendErrorEl.innerHTML = '';
+        return;
+      }
+
+      backendErrorEl.innerHTML = `
+        ${escapeHtml(message)}
+        ${detail ? `<small>${escapeHtml(detail)}</small>` : ''}
+      `;
+      backendErrorEl.classList.add('show');
+    }
+
+    function showEmpty(message){
+      resultsEl.innerHTML = `<div class="empty-state">${escapeHtml(message)}</div>`;
+    }
+
+    async function apiCall(payload){
+      const formData = new URLSearchParams();
+
+      Object.keys(payload).forEach(key => {
+        const value = typeof payload[key] === 'object'
+          ? JSON.stringify(payload[key])
+          : String(payload[key] ?? '');
+        formData.append(key, value);
       });
+
+      const res = await fetch(SCRIPT_URL, {
+        method:'POST',
+        body:formData
+      });
+
+      const text = await res.text();
+      if (!text.trim()) throw new Error('Empty response from Apps Script');
+      return JSON.parse(text);
+    }
+
+    async function apiGetPeople(forceRefresh = false){
+      const url = SCRIPT_URL + '?action=getPeople' + (forceRefresh ? '&forceRefresh=true' : '');
+      const res = await fetch(url);
+      const text = await res.text();
+      if (!text.trim()) throw new Error('Empty response from Apps Script');
+      return JSON.parse(text);
+    }
+
+    function normalizePerson(p){
+      return {
+        id: String(p.id || ''),
+        first_name: String(p.first_name || '').trim(),
+        last_name: String(p.last_name || '').trim(),
+        name: String(p.name || '').trim(),
+        email: String(p.email || '').trim(),
+        phone: String(p.phone || '').trim()
+      };
+    }
+
+    async function loadPeople(forceRefresh = false){
+      showEmpty('Loading children list...');
+      showBackendError('');
+      setStatus('Loading children list...');
+
+      try {
+        const res = await apiGetPeople(forceRefresh);
+
+        if (!res || !res.ok) {
+          allPeople = [];
+          filteredPeople = [];
+          showEmpty('Children list unavailable.');
+          setStatus(res?.error || 'Failed to load children list.', 'err');
+          showBackendError('Backend returned an error.', res?.error || '');
+          return;
+        }
+
+        allPeople = Array.isArray(res.rows) ? res.rows.map(normalizePerson) : [];
+        filteredPeople = [...allPeople];
+        renderResults();
+        setStatus(`Loaded ${allPeople.length} active children.`, 'ok');
+        showBackendError('');
+      } catch (e) {
+        console.error(e);
+        allPeople = [];
+        filteredPeople = [];
+        showEmpty('Children list unavailable.');
+        setStatus('Failed to load children list.', 'err');
+        showBackendError('Could not reach the kids check-in backend.', e.message || '');
+      }
+    }
+
+    function applyFilter(query){
+      const q = String(query || '').trim().toLowerCase();
+
+      if (!q){
+        filteredPeople = [...allPeople];
+        renderResults();
+        return;
+      }
+
+      filteredPeople = allPeople.filter(p => {
+        return String(p.last_name || '').toLowerCase().includes(q) ||
+               String(p.first_name || '').toLowerCase().includes(q) ||
+               String(p.name || '').toLowerCase().includes(q);
+      });
+
+      renderResults();
+    }
+
+    function renderResults(){
+      resultsEl.innerHTML = '';
+
+      if (!allPeople.length) {
+        showEmpty('Children list unavailable.');
+        return;
+      }
+
+      if (!filteredPeople.length){
+        showEmpty('No matches found.');
+        return;
+      }
+
+      filteredPeople.forEach(p => {
+        const row = document.createElement('label');
+        row.className = 'check-row';
+        row.innerHTML = `
+          <input type="checkbox" value="${escapeHtml(p.id)}" data-name="${escapeHtml(p.name)}">
+          <div class="person-text">
+            <strong>${escapeHtml(p.name)}</strong>
+            <small>${escapeHtml(p.email || p.phone || 'Tap to select')}</small>
+          </div>
+        `;
+        resultsEl.appendChild(row);
+      });
+    }
+
+    function selectAllShown(){
+      const boxes = resultsEl.querySelectorAll('input[type="checkbox"]');
+      if (!boxes.length) {
+        setStatus('No children are currently shown.', 'err');
+        return;
+      }
+      boxes.forEach(cb => cb.checked = true);
+      setStatus('All shown children selected.', 'ok');
+    }
+
+    function addCheckedPeople(){
+      const checked = resultsEl.querySelectorAll('input[type="checkbox"]:checked');
+
+      if (!checked.length){
+        setStatus('Select at least one child first.', 'err');
+        return;
+      }
+
+      checked.forEach(cb => {
+        const id = cb.value;
+        const person = allPeople.find(p => String(p.id) === String(id));
+        if (person) selected.set(String(id), person);
+      });
+
+      renderSelected();
+      setStatus(`${checked.length} selected ${checked.length === 1 ? 'child added' : 'children added'}.`, 'ok');
+    }
+
+    function renderSelected(){
+      selectedEl.innerHTML = '';
+
+      if (!selected.size){
+        selectedHintEl.style.display = '';
+        return;
+      }
+
+      selectedHintEl.style.display = 'none';
+
+      selected.forEach(p => {
+        const chip = document.createElement('button');
+        chip.className = 'name-chip';
+        chip.type = 'button';
+        chip.textContent = p.name + ' ×';
+        chip.onclick = () => {
+          selected.delete(String(p.id));
+          renderSelected();
+        };
+        selectedEl.appendChild(chip);
+      });
+    }
+
+    async function submitAttendance(){
+      if (!selected.size){
+        setStatus('Select at least one child.', 'err');
+        return;
+      }
+
+      const people = [...selected.values()].map(p => ({
+        id: String(p.id),
+        name: String(p.name || '')
+      }));
+
+      const personIds = people.map(p => p.id);
+
+      const d = new Date();
+      const yyyy = d.getFullYear();
+      const mm = String(d.getMonth() + 1).padStart(2,'0');
+      const dd = String(d.getDate()).padStart(2,'0');
+      const iso = `${yyyy}-${mm}-${dd}`;
+
+      setStatus('Submitting kids check-in...');
+      showBackendError('');
+
+      try{
+        const res = await apiCall({
+          action:'submitAttendance',
+          people: people,
+          personIds: personIds,
+          noteText:'',
+          label:'VUMC Kids Check-In',
+          isoDate:iso
+        });
+
+        if (res.ok){
+          successText.textContent = `${people.length} ${people.length === 1 ? 'child has' : 'children have'} been checked in on ${iso}.`;
+          mainPanel.style.display = 'none';
+          successScreen.classList.add('show');
+          setTimeout(resetKiosk, 5000);
+        } else {
+          setStatus(res?.error || 'Submit failed', 'err');
+          showBackendError('Submission failed.', res?.error || '');
+          alert(res?.error || 'Submit failed');
+        }
+      } catch(e){
+        console.error(e);
+        setStatus('Submit failed', 'err');
+        showBackendError('Could not submit kids check-in.', e.message || '');
+        alert(e.message || 'Submit failed');
+      }
+    }
+
+    function resetKiosk(){
+      selected.clear();
+      renderSelected();
+      qEl.value = '';
+      filteredPeople = [...allPeople];
+      renderResults();
+      successScreen.classList.remove('show');
+      mainPanel.style.display = '';
+      setStatus('');
+      showBackendError('');
+      qEl.focus();
+    }
+
+    clearSearchBtn.onclick = () => {
+      qEl.value = '';
+      filteredPeople = [...allPeople];
+      renderResults();
+      setStatus('');
+      qEl.focus();
+    };
+
+    clearSelectedBtn.onclick = () => {
+      selected.clear();
+      renderSelected();
+      setStatus('Selection cleared.');
+    };
+
+    selectPageBtn.onclick = selectAllShown;
+    addSelectedBtn.onclick = addCheckedPeople;
+    submitBtn.onclick = submitAttendance;
+    retryLoadBtn.onclick = () => loadPeople(true);
+
+    qEl.addEventListener('input', () => {
+      clearTimeout(debounceTimer);
+      debounceTimer = setTimeout(() => applyFilter(qEl.value), 200);
     });
+
+    loadPeople().then(() => qEl.focus());
   </script>
 </body>
 </html>
